@@ -1,13 +1,13 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import MainLayout from './components/MainLayout';
-import BrandsCatalog from './components/BrandsCatalog';
+import EmployeesCatalog from './components/EmployeesCatalog';
 
 function Dashboard() { return <div>Дашборд</div>; }
 function Devices() { return <div>Техника</div>; }
 function Consumables() { return <div>Расходники</div>; }
 function Cartridges() { return <div>Картриджи</div>; }
-function References() { return <BrandsCatalog />; } 
+function References() { return <EmployeesCatalog />; } 
 function Repairs() { return <div>Ремонт</div>; }
 function Refueling() { return <div>Заправка</div>; }
 
