@@ -135,7 +135,7 @@ export default function AddressesCatalog() {
         </Button>
       </Box>
 
-      <Box sx={{ height: 'calc(100vh - 160px)', mt: 2 }}>
+      <Box sx={{ height: 'calc(100vh - 200px)', mt: 2 }}>
         <DataGrid
           rows={addresses}
           columns={columns}

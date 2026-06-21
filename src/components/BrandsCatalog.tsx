@@ -114,7 +114,7 @@ export default function BrandsCatalog() {
         </Button>
       </Box>
 
-      <Box className="h-130 mt-4">
+      <Box sx={{ height: 'calc(100vh - 200px)', mt: 2 }}>
         <DataGrid
           rows={brands}
           columns={columns}

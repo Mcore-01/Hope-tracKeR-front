@@ -1,16 +1,15 @@
 import Button from '@mui/material/Button';
-import type { Employee } from '../models/Employee';
+import type { Category } from '../models/Category';
 import { useCallback, useEffect, useState } from 'react';
-import { createEmployee, getAllEmployees, removeEmployee, updateEmployee } from '../services/EmployeeService';
+import { createCategory, getAllCategories, removeCategory, updateCategory } from '../services/CategoryService';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography } from '@mui/material';
 
-export default function EmployeesCatalog() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+export default function CategoriesCatalog() {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [fullName, setFullName] = useState('');
-  const [staff, setStaff] = useState('');
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [name, setName] = useState('');
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -22,74 +21,70 @@ export default function EmployeesCatalog() {
     setSnackbarOpen(true);
   }, []);
 
-  const loadEmployees = useCallback(() => {
-    getAllEmployees()
-      .then(data => setEmployees(data))
+  const loadCategories = useCallback(() => {
+    getAllCategories()
+      .then(data => setCategories(data))
       .catch(error => {
-        console.error('Ошибка загрузки сотрудников:', error);
-        showNotification('Не удалось загрузить сотрудников', 'error');
+        console.error('Ошибка загрузки категорий:', error);
+        showNotification('Не удалось загрузить категории', 'error');
       });
   }, [showNotification]);
 
   useEffect(() => {
-    loadEmployees();
-  }, [loadEmployees]);
+    loadCategories();
+  }, [loadCategories]);
 
-  const handleOpenDialog = (employee?: Employee) => {
-    if (employee) {
-      setEditingEmployee(employee);
-      setFullName(employee.fullName);
-      setStaff(employee.staff);
+  const handleOpenDialog = (category?: Category) => {
+    if (category) {
+      setEditingCategory(category);
+      setName(category.name);
     } else {
-      setEditingEmployee(null);
-      setFullName('');
-      setStaff('');
+      setEditingCategory(null);
+      setName('');
     }
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setEditingEmployee(null);
-    setFullName('');
-    setStaff('');
+    setEditingCategory(null);
+    setName('');
   };
 
   const handleSave = async () => {
-    if (!fullName.trim() || !staff.trim()) {
-      showNotification('Все поля должны быть заполнены', 'warning');
+    if (!name.trim()) {
+      showNotification('Название не может быть пустым', 'warning');
       return;
     }
 
     try {
-      if (editingEmployee) {
-        await updateEmployee({ ...editingEmployee, fullName: fullName.trim(), staff: staff.trim() });
+      if (editingCategory) {
+        await updateCategory({ ...editingCategory, name: name.trim() });
       } else {
-        await createEmployee({ fullName: fullName.trim(), staff: staff.trim() });
+        await createCategory({ name: name.trim() });
       }
       handleCloseDialog();
-      loadEmployees();
+      loadCategories();
     } catch (error) {
-      console.error('Ошибка сохранения сотрудника:', error);
-      showNotification('Не удалось сохранить сотрудника', 'error');
+      console.error('Ошибка сохранения категории:', error);
+      showNotification('Не удалось сохранить категорию', 'error');
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Уверены что хотите удалить сотрудника?')) return;
+    if (!window.confirm('Уверены что хотите удалить категорию?')) return;
     try {
-      await removeEmployee(id);
-      loadEmployees();
+      await removeCategory(id);
+      loadCategories();
     } catch (error) {
-      console.error('Ошибка удаления сотрудника:', error);
-      showNotification('Не удалось удалить сотрудника', 'error');
+      console.error('Ошибка удаления категории:', error);
+      showNotification('Не удалось удалить категорию', 'error');
     }
   };
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'fullName', headerName: 'ФИО', width: 250 },
-    { field: 'staff', headerName: 'Должность', width: 300 },
+    { field: 'name', headerName: 'Название', width: 200 },
     {
       field: 'actions',
       headerName: 'Действия',
@@ -111,7 +106,7 @@ export default function EmployeesCatalog() {
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="h4" component="h1">
-          Сотрудники
+          Категории
         </Typography>
         <Button variant="outlined" color="primary" onClick={() => handleOpenDialog()}>
           Добавить
@@ -120,7 +115,7 @@ export default function EmployeesCatalog() {
 
       <Box sx={{ height: 'calc(100vh - 200px)', mt: 2 }}>
         <DataGrid
-          rows={employees}
+          rows={categories}
           columns={columns}
           showToolbar
           initialState={{
@@ -135,22 +130,15 @@ export default function EmployeesCatalog() {
       </Box>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>{editingEmployee ? 'Редактировать сотрудника' : 'Добавить сотрудника'}</DialogTitle>
+        <DialogTitle>{editingCategory ? 'Редактировать категорию' : 'Добавить категорию'}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="ФИО"
+            label="Название"
             fullWidth
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Должность"
-            fullWidth
-            value={staff}
-            onChange={(e) => setStaff(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </DialogContent>
         <DialogActions>

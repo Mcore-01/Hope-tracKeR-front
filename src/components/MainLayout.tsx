@@ -19,7 +19,7 @@ const menuItems = [
   { text: 'Техника', path: '/devices', icon: <HardwareIcon />, color: '#2e7d32' },
   { text: 'Расходники', path: '/consumables', icon: <InventoryIcon />, color: '#ed6c02' },
   { text: 'Картриджи', path: '/cartridges', icon: <LocalPrintshopIcon />, color: '#9c27b0' },
-  { text: 'Справочники', path: '/references', icon: <LibraryBooksIcon />, color: '#d32f2f' },
+  { text: 'Справочники', path: '/catalogs', icon: <LibraryBooksIcon />, color: '#d32f2f' },
   { text: 'Ремонт', path: '/repairs', icon: <BuildIcon />, color: '#0288d1' },
   { text: 'Заправка', path: '/refueling', icon: <LocalGasStationIcon />, color: '#00897b' },
 ];
