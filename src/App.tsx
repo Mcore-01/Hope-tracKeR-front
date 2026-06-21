@@ -1,15 +1,12 @@
-import './App.css'
-import Button from '@mui/material/Button';
+import './App.css';
+import BrandsCatalog from './components/BrandsCatalog';
 
 function App() {
-
   return (
     <div className="p-10">
-      <Button variant="contained" className="bg-blue-500 hover:bg-blue-700">
-        hope
-      </Button>
+      <BrandsCatalog />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
