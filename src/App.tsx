@@ -3,11 +3,11 @@ import './App.css';
 import MainLayout from './components/MainLayout';
 import CatalogPage from './pages/CatalogPage';
 import DevicesTable from './components/DevicesTable';
+import RepairsTable from './components/RepairsTable';
 
 function Dashboard() { return <div>Дашборд</div>; }
 function Consumables() { return <div>Расходники</div>; }
 function Cartridges() { return <div>Картриджи</div>; }
-function Repairs() { return <div>Ремонт</div>; }
 function Refueling() { return <div>Заправка</div>; }
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
           <Route path="consumables" element={<Consumables />} />
           <Route path="cartridges" element={<Cartridges />} />
           <Route path="catalogs" element={<CatalogPage />} />
-          <Route path="repairs" element={<Repairs />} />
+          <Route path="repairs" element={<RepairsTable />} />
           <Route path="refueling" element={<Refueling />} />
         </Route>
       </Routes>

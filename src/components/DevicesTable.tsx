@@ -1,25 +1,46 @@
 import { useEffect, useState, useMemo } from 'react';
 import { DataGrid, GridCheckCircleIcon, type GridColDef } from '@mui/x-data-grid';
-import { Box, Chip, Alert, Snackbar, Typography, Paper, Button } from '@mui/material';
-import { getDevicesByFilter } from '../services/DeviceService';
+import { Box, Chip, Alert, Snackbar, Typography, Paper, Button, IconButton, Tooltip } from '@mui/material';
+import { getDevicesByFilter, createDevice, updateDevice, deleteDevice, exportDevicesToExcel } from '../services/DeviceService';
 import type { DeviceResponse } from '../models/DeviceResponse';
 import { DeviceStatusLabels } from '../enums/DeviceStatus';
 import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
 import ErrorIcon from '@mui/icons-material/Error';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import BuildIcon from '@mui/icons-material/Build';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import DeviceFormDialog from './DeviceFormDialog';
+import StartRepairDialog from './StartRepairDialog';
+import IssueDeviceDialog from './IssueDeviceDialog';
+import WriteOffDialog from './WriteOffDialog';
+import type { DeviceRequest } from '../models/DeviceRequest';
 
 export default function DevicesTable() {
   const [devices, setDevices] = useState<DeviceResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingDevice, setEditingDevice] = useState<DeviceResponse | null>(null);
+  const [repairDialogOpen, setRepairDialogOpen] = useState(false);
+  const [repairDeviceId, setRepairDeviceId] = useState<number | null>(null);
+  const [issueDialogOpen, setIssueDialogOpen] = useState(false);
+  const [issueDeviceId, setIssueDeviceId] = useState<number | null>(null);
+  const [writeOffDialogOpen, setWriteOffDialogOpen] = useState(false);
+  const [writeOffDeviceId, setWriteOffDeviceId] = useState<number | null>(null);
 
-  useEffect(() => {
+  const loadDevices = () => {
     getDevicesByFilter({})
       .then(setDevices)
-      .catch((err) => {
-        console.error('Ошибка загрузки устройств:', err);
+      .catch((error) => {
+        console.error('Ошибка загрузки устройств:', error);
         setError('Не удалось загрузить устройства');
       });
+  };
+
+  useEffect(() => {
+    loadDevices();
   }, []);
 
   const stats = useMemo(() => {
@@ -32,9 +53,63 @@ export default function DevicesTable() {
     return { total, statusCounts };
   }, [devices]);
 
+  const handleAdd = () => {
+    setEditingDevice(null);
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (device: DeviceResponse) => {
+    setEditingDevice(device);
+    setDialogOpen(true);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить это устройство?')) return;
+    try {
+      await deleteDevice(id);
+      loadDevices();
+    } catch (error) {
+      console.error('Ошибка удаления:', error);
+      setError('Не удалось удалить устройство');
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await exportDevicesToExcel({});
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'Устройства.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Ошибка экспорта:', error);
+      setError('Не удалось экспортировать данные');
+    }
+  };
+
+  const handleSaveDevice = async (deviceData: DeviceRequest) => {
+    try {
+      if (editingDevice) {
+        await updateDevice(deviceData);
+      } else {
+        await createDevice(deviceData);
+      }
+      loadDevices();
+      setDialogOpen(false);
+    } catch (error) {
+      console.error('Ошибка сохранения:', error);
+      setError('Не удалось сохранить устройство');
+      throw error;
+    }
+  };
+
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'name', headerName: 'Наименование', width: 200 },
+    { field: 'id', headerName: 'ID', width: 30 },
+    { field: 'name', headerName: 'Наименование', width: 180 },
     { field: 'serialNumber', headerName: 'Серийный номер', width: 150 },
     {
       field: 'status',
@@ -71,22 +146,61 @@ export default function DevicesTable() {
     {
       field: 'addedDate',
       headerName: 'Дата добавления',
-      width: 180,
+      width: 120,
       valueGetter: (_, row: DeviceResponse) => new Date(row.addedDate).toLocaleDateString('ru-RU'),
     },
-    { field: 'brand', headerName: 'Бренд', width: 150 },
-    { field: 'category', headerName: 'Категория', width: 150 },
-    { field: 'address', headerName: 'Адрес', width: 200 },
+    { field: 'brand', headerName: 'Бренд', width: 130 },
+    { field: 'category', headerName: 'Категория', width: 130 },
+    { field: 'address', headerName: 'Адрес', width: 320 },
     { field: 'employee', headerName: 'Сотрудник', width: 180 },
+    {
+      field: 'actions',
+      headerName: 'Действия',
+      width: 200,
+      renderCell: (params) => {
+        const device = params.row as DeviceResponse;
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+            <Tooltip title="Удалить">
+              <IconButton size="small" color="error" onClick={() => handleDelete(device.id)}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            {device.status === 'InStock' && (
+              <>
+                <Tooltip title="В ремонт">
+                  <IconButton size="small" color="warning" onClick={() => {
+                    setRepairDeviceId(device.id);
+                    setRepairDialogOpen(true);
+                  }}>
+                    <BuildIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Выдать">
+                  <IconButton size="small" color="primary" onClick={() => {
+                    setIssueDeviceId(device.id);
+                    setIssueDialogOpen(true);
+                  }}>
+                    <AssignmentIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+            {device.status !== 'WriteOff' && (
+              <Tooltip title="Списать">
+                <IconButton size="small" color="secondary" onClick={() => {
+                  setWriteOffDeviceId(device.id);
+                  setWriteOffDialogOpen(true);
+                }}>
+                  <DeleteSweepIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        );
+      },
+    },
   ];
-
-  const handleAdd = () => {
-    console.log('Добавить технику');
-  };
-
-  const handleExport = () => {
-    console.log('Экспорт в Excel');
-  };
 
   return (
     <>
@@ -123,6 +237,7 @@ export default function DevicesTable() {
           rows={devices}
           columns={columns}
           showToolbar
+          onRowDoubleClick={(params) => handleEdit(params.row as DeviceResponse)}
           initialState={{
             pagination: { paginationModel: { pageSize: 10 } },
           }}
@@ -140,6 +255,34 @@ export default function DevicesTable() {
           {error}
         </Alert>
       </Snackbar>
+
+      <DeviceFormDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSave={handleSaveDevice}
+        initialData={editingDevice}
+      />
+
+      <StartRepairDialog
+        open={repairDialogOpen}
+        onClose={() => setRepairDialogOpen(false)}
+        deviceId={repairDeviceId!}
+        onSuccess={loadDevices}
+      />
+
+      <IssueDeviceDialog
+        open={issueDialogOpen}
+        onClose={() => setIssueDialogOpen(false)}
+        deviceId={issueDeviceId!}
+        onSuccess={loadDevices}
+      />
+
+      <WriteOffDialog
+        open={writeOffDialogOpen}
+        onClose={() => setWriteOffDialogOpen(false)}
+        deviceId={writeOffDeviceId!}
+        onSuccess={loadDevices}
+      />
     </>
   );
 }
