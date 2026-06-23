@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import type { Address } from '../../models/Address';
 import { createAddress, getAllAddresses, removeAddress, updateAddress } from '../../services/AddressService';
 import { useAuth } from '../../hooks/useAuth';
+import ConfirmDialog from '../common/ConfirmDialog';
 
 export default function AddressesCatalog() {
   const { isAuth } = useAuth();
@@ -16,6 +17,9 @@ export default function AddressesCatalog() {
   const [building, setBuilding] = useState('');
   const [floor, setFloor] = useState<number | ''>('');
   const [room, setRoom] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -93,15 +97,30 @@ export default function AddressesCatalog() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Уверены что хотите удалить адрес?')) return;
+  const handleDeleteClick = (id: number) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
     try {
-      await removeAddress(id);
+      await removeAddress(deleteId);
       loadAddresses();
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
     } catch (error) {
       console.error('Ошибка удаления адреса:', error);
       showNotification('Не удалось удалить адрес', 'error');
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
   };
 
   const columns: GridColDef[] = [
@@ -124,7 +143,7 @@ export default function AddressesCatalog() {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Удалить">
-                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                <IconButton size="small" color="error" onClick={() => handleDeleteClick(params.row.id)}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -221,6 +240,17 @@ export default function AddressesCatalog() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Подтверждение удаления"
+        message="Вы уверены, что хотите удалить этот адрес?"
+        confirmText="Удалить"
+        confirmColor="error"
+        loading={deleting}
+      />
     </>
   );
 }

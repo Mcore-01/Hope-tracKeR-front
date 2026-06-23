@@ -6,6 +6,7 @@ import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAuth } from '../../hooks/useAuth';
+import ConfirmDialog from '../common/ConfirmDialog';
 
 export default function BrandsCatalog() {
   const { isAuth } = useAuth();
@@ -14,6 +15,9 @@ export default function BrandsCatalog() {
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [name, setName] = useState('');
   const LabelTable: string = 'Бренды';
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -75,15 +79,30 @@ export default function BrandsCatalog() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Уверены что хотите удалить бренд?')) return;
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
     try {
-      await removeBrand(id);
+      await removeBrand(deleteId);
       loadBrands();
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
     } catch (error) {
       console.error('Ошибка удаления бренда:', error);
       showNotification('Не удалось удалить бренд', 'error');
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
   };
 
   const columns: GridColDef[] = [
@@ -103,7 +122,7 @@ export default function BrandsCatalog() {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Удалить">
-                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                <IconButton size="small" color="error" onClick={() => handleDeleteClick(params.row.id)}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -177,6 +196,17 @@ export default function BrandsCatalog() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Подтверждение удаления"
+        message="Вы уверены, что хотите удалить этот бренд?"
+        confirmText="Удалить"
+        confirmColor="error"
+        loading={deleting}
+      />
     </>
   );
 }

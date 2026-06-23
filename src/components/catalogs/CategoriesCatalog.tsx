@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import type { Category } from '../../models/Category';
 import { createCategory, getAllCategories, removeCategory, updateCategory } from '../../services/CategoryService';
 import { useAuth } from '../../hooks/useAuth';
+import ConfirmDialog from '../common/ConfirmDialog';
 
 export default function CategoriesCatalog() {
   const { isAuth } = useAuth();
@@ -13,6 +14,9 @@ export default function CategoriesCatalog() {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -74,15 +78,30 @@ export default function CategoriesCatalog() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Уверены что хотите удалить категорию?')) return;
+  const handleDeleteClick = (id: number) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
     try {
-      await removeCategory(id);
+      await removeCategory(deleteId);
       loadCategories();
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
     } catch (error) {
       console.error('Ошибка удаления категории:', error);
       showNotification('Не удалось удалить категорию', 'error');
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
   };
 
   const columns: GridColDef[] = [
@@ -102,7 +121,7 @@ export default function CategoriesCatalog() {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Удалить">
-                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                <IconButton size="small" color="error" onClick={() => handleDeleteClick(params.row.id)}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -176,6 +195,17 @@ export default function CategoriesCatalog() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Подтверждение удаления"
+        message="Вы уверены, что хотите удалить эту категорию?"
+        confirmText="Удалить"
+        confirmColor="error"
+        loading={deleting}
+      />
     </>
   );
 }

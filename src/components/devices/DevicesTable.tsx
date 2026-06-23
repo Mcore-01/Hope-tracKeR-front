@@ -18,7 +18,7 @@ import IssueDeviceDialog from './IssueDeviceDialog';
 import WriteOffDialog from './WriteOffDialog';
 import type { DeviceRequest } from '../../models/DeviceRequest';
 import { useAuth } from '../../hooks/useAuth';
-
+import ConfirmDialog from '../common/ConfirmDialog';
 
 export default function DevicesTable() {
   const { isAuth } = useAuth();
@@ -32,6 +32,9 @@ export default function DevicesTable() {
   const [issueDeviceId, setIssueDeviceId] = useState<number | null>(null);
   const [writeOffDialogOpen, setWriteOffDialogOpen] = useState(false);
   const [writeOffDeviceId, setWriteOffDeviceId] = useState<number | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadDevices = () => {
     getDevicesByFilter({})
@@ -66,15 +69,30 @@ export default function DevicesTable() {
     setDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Вы уверены, что хотите удалить это устройство?')) return;
+  const handleDeleteClick = (id: number) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
     try {
-      await deleteDevice(id);
+      await deleteDevice(deleteId);
       loadDevices();
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
     } catch (error) {
       console.error('Ошибка удаления:', error);
       setError('Не удалось удалить устройство');
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
   };
 
   const handleExport = async () => {
@@ -167,7 +185,7 @@ export default function DevicesTable() {
             {isAuth && (
               <>
                 <Tooltip title="Удалить">
-                  <IconButton size="small" color="error" onClick={() => handleDelete(device.id)}>
+                  <IconButton size="small" color="error" onClick={() => handleDeleteClick(device.id)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -291,6 +309,17 @@ export default function DevicesTable() {
         onClose={() => setWriteOffDialogOpen(false)}
         deviceId={writeOffDeviceId!}
         onSuccess={loadDevices}
+      />
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Подтверждение удаления"
+        message="Вы уверены, что хотите удалить это устройство?"
+        confirmText="Удалить"
+        confirmColor="error"
+        loading={deleting}
       />
     </>
   );

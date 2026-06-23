@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import type { Employee } from '../../models/Employee';
 import { createEmployee, getAllEmployees, removeEmployee, updateEmployee } from '../../services/EmployeeService';
 import { useAuth } from '../../hooks/useAuth';
+import ConfirmDialog from '../common/ConfirmDialog';
 
 export default function EmployeesCatalog() {
   const { isAuth } = useAuth();
@@ -14,6 +15,9 @@ export default function EmployeesCatalog() {
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [fullName, setFullName] = useState('');
   const [staff, setStaff] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -78,15 +82,30 @@ export default function EmployeesCatalog() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Уверены что хотите удалить сотрудника?')) return;
+  const handleDeleteClick = (id: number) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (deleteId === null) return;
+    setDeleting(true);
     try {
-      await removeEmployee(id);
+      await removeEmployee(deleteId);
       loadEmployees();
+      setDeleteDialogOpen(false);
+      setDeleteId(null);
     } catch (error) {
       console.error('Ошибка удаления сотрудника:', error);
       showNotification('Не удалось удалить сотрудника', 'error');
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
   };
 
   const columns: GridColDef[] = [
@@ -107,7 +126,7 @@ export default function EmployeesCatalog() {
                 </IconButton>
               </Tooltip>
               <Tooltip title="Удалить">
-                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                <IconButton size="small" color="error" onClick={() => handleDeleteClick(params.row.id)}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -188,6 +207,17 @@ export default function EmployeesCatalog() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Подтверждение удаления"
+        message="Вы уверены, что хотите удалить этого сотрудника?"
+        confirmText="Удалить"
+        confirmColor="error"
+        loading={deleting}
+      />
     </>
   );
 }
