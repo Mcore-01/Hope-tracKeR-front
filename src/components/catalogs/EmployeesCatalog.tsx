@@ -5,8 +5,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import type { Employee } from '../../models/Employee';
 import { createEmployee, getAllEmployees, removeEmployee, updateEmployee } from '../../services/EmployeeService';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function EmployeesCatalog() {
+  const { isAuth } = useAuth();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -97,16 +99,20 @@ export default function EmployeesCatalog() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-          <Tooltip title="Изменить">
-            <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Удалить">
-            <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {isAuth && (
+            <>
+              <Tooltip title="Изменить">
+                <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Удалить">
+                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
         </Box>
       ),
     },
@@ -118,9 +124,11 @@ export default function EmployeesCatalog() {
         <Typography variant="h4" component="h1">
           Сотрудники
         </Typography>
-        <Button variant="contained" onClick={() => handleOpenDialog()}>
-          Добавить
-        </Button>
+        {isAuth && (
+          <Button variant="contained" onClick={() => handleOpenDialog()}>
+            Добавить
+          </Button>
+        )}
       </Box>
 
       <Box sx={{ height: 'calc(100vh - 200px)', mt: 2 }}>

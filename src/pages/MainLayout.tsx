@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -6,17 +6,20 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import HardwareIcon from '@mui/icons-material/Hardware';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import BuildIcon from '@mui/icons-material/Build';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import Avatar from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import { useAuth } from '../hooks/useAuth';
 
 const menuItems = [
-  { text: 'Дашборд', path: '/', icon: <DashboardIcon />, color: '#1976d2' },
-  { text: 'Техника', path: '/devices', icon: <HardwareIcon />, color: '#2e7d32' },
+  { text: 'Техника', path: '/', icon: <HardwareIcon />, color: '#2e7d32' },
   { text: 'Расходники', path: '/consumables', icon: <InventoryIcon />, color: '#ed6c02' },
   { text: 'Картриджи', path: '/cartridges', icon: <LocalPrintshopIcon />, color: '#9c27b0' },
   { text: 'Справочники', path: '/catalogs', icon: <LibraryBooksIcon />, color: '#d32f2f' },
@@ -26,6 +29,17 @@ const menuItems = [
 
 export default function MainLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuth, userName, logoutUser } = useAuth();
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate('/login');
+  };
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
@@ -39,10 +53,12 @@ export default function MainLayout() {
             boxSizing: 'border-box',
             position: 'relative',
             height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
           },
         }}
       >
-        <Box sx={{ overflow: 'auto', mt: 2 }}>
+        <Box sx={{ overflow: 'auto', flexGrow: 1, mt: 2 }}>
           <List>
             {menuItems.map((item) => {
               const isActive = location.pathname === item.path;
@@ -81,6 +97,27 @@ export default function MainLayout() {
               );
             })}
           </List>
+        </Box>
+
+        <Divider />
+
+        <Box sx={{ p: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Avatar sx={{ bgcolor: '#d32f2f', width: 32, height: 32 }}>
+              {isAuth ? userName.charAt(0).toUpperCase() : 'Г'}
+            </Avatar>
+            <Typography variant="body2">
+              {isAuth ? userName : 'Гость'}
+            </Typography>
+          </Box>
+          <Button
+            variant="outlined"
+            color={isAuth ? 'error' : 'primary'}
+            size="small"
+            onClick={isAuth ? handleLogout : handleLogin}
+          >
+            {isAuth ? 'Выйти' : 'Войти'}
+          </Button>
         </Box>
       </Drawer>
 

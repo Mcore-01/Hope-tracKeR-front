@@ -5,8 +5,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import type { Category } from '../../models/Category';
 import { createCategory, getAllCategories, removeCategory, updateCategory } from '../../services/CategoryService';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function CategoriesCatalog() {
+  const { isAuth } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -92,16 +94,20 @@ export default function CategoriesCatalog() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-          <Tooltip title="Изменить">
-            <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Удалить">
-            <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {isAuth && (
+            <>
+              <Tooltip title="Изменить">
+                <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Удалить">
+                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
         </Box>
       ),
     },
@@ -113,9 +119,11 @@ export default function CategoriesCatalog() {
         <Typography variant="h4" component="h1">
           Категории
         </Typography>
-        <Button variant="contained" onClick={() => handleOpenDialog()}>
-          Добавить
-        </Button>
+        {isAuth && (
+          <Button variant="contained" onClick={() => handleOpenDialog()}>
+            Добавить
+          </Button>
+        )}
       </Box>
 
       <Box sx={{ height: 'calc(100vh - 200px)', mt: 2 }}>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAllAddresses } from '../../services/AddressService';
 import type { Address } from '../../models/Address';
 import { completeRepair } from '../../services/DeviceService';
+import { useAuth } from '../../hooks/useAuth';
 
 interface CompleteRepairDialogProps {
   open: boolean;
@@ -12,6 +13,7 @@ interface CompleteRepairDialogProps {
 }
 
 export default function CompleteRepairDialog({ open, onClose, deviceId, onSuccess }: CompleteRepairDialogProps) {
+  const { userId } = useAuth();
   const [addressId, setAddressId] = useState<number>(0);
   const [diagnosis, setDiagnosis] = useState('');
   const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -55,7 +57,7 @@ export default function CompleteRepairDialog({ open, onClose, deviceId, onSucces
       await completeRepair({
         itemId: deviceId,
         currentAddressId: addressId,
-        userId: 1,
+        userId: Number(userId),
         diagnosis: diagnosis.trim(),
         endDate: new Date(endDate).toISOString(),
       });

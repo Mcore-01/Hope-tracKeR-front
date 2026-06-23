@@ -4,8 +4,8 @@ import MainLayout from './pages/MainLayout';
 import CatalogPage from './pages/CatalogPage';
 import DevicesTable from './components/devices/DevicesTable';
 import RepairsTable from './components/devices/RepairsTable';
+import LoginPage from './pages/LoginPage';
 
-function Dashboard() { return <div>Дашборд</div>; }
 function Consumables() { return <div>Расходники</div>; }
 function Cartridges() { return <div>Картриджи</div>; }
 function Refueling() { return <div>Заправка</div>; }
@@ -15,9 +15,9 @@ function App() {
     <div>
       <BrowserRouter>
       <Routes>
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="devices" element={<DevicesTable />} />
+          <Route index element={<DevicesTable />} />
           <Route path="consumables" element={<Consumables />} />
           <Route path="cartridges" element={<Cartridges />} />
           <Route path="catalogs" element={<CatalogPage />} />

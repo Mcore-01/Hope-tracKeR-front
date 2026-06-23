@@ -5,8 +5,10 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography, IconButton, Tooltip, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function BrandsCatalog() {
+  const { isAuth } = useAuth();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
@@ -93,16 +95,20 @@ export default function BrandsCatalog() {
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-          <Tooltip title="Изменить">
-            <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Удалить">
-            <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {isAuth && (
+            <>
+              <Tooltip title="Изменить">
+                <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Удалить">
+                <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
         </Box>
       ),
     },
@@ -114,9 +120,11 @@ export default function BrandsCatalog() {
         <Typography variant="h4" component="h1">
           {LabelTable}
         </Typography>
-        <Button variant="contained" onClick={() => handleOpenDialog()}>
-          Добавить
-        </Button>
+        {isAuth && (
+          <Button variant="contained" onClick={() => handleOpenDialog()}>
+            Добавить
+          </Button>
+        )}
       </Box>
 
       <Box sx={{ height: 'calc(100vh - 200px)', mt: 2 }}>

@@ -4,8 +4,10 @@ import { Box, Button, Alert, Snackbar } from '@mui/material';
 import { getDevicesByFilter, generateRepairAct } from '../../services/DeviceService';
 import type { DeviceResponse } from '../../models/DeviceResponse';
 import CompleteRepairDialog from './CompleteRepairDialog';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function RepairsTable() {
+  const { isAuth } = useAuth();
   const [devices, setDevices] = useState<DeviceResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
@@ -62,16 +64,18 @@ export default function RepairsTable() {
         const device = params.row as DeviceResponse;
         return (
           <Box>
-            <Button
-              size="small"
-              color="success"
-              onClick={() => {
-                setCompleteDeviceId(device.id);
-                setCompleteDialogOpen(true);
-              }}
-            >
-              Завершить ремонт
-            </Button>
+            {isAuth && (
+              <Button
+                size="small"
+                color="success"
+                onClick={() => {
+                  setCompleteDeviceId(device.id);
+                  setCompleteDialogOpen(true);
+                }}
+              >
+                Завершить ремонт
+              </Button>
+            )}
             <Button
               size="small"
               color="info"

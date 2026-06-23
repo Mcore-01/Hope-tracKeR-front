@@ -1,6 +1,7 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Alert, Snackbar } from '@mui/material';
 import { useState } from 'react';
 import { writeOffDevice } from '../../services/DeviceService';
+import { useAuth } from '../../hooks/useAuth';
 
 interface WriteOffDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ export default function WriteOffDialog({
   deviceId,
   onSuccess,
 }: WriteOffDialogProps) {
+  const { userId } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -23,7 +25,7 @@ export default function WriteOffDialog({
     try {
       await writeOffDevice({
         itemId: deviceId,
-        userId: 1,
+        userId: Number(userId),
       });
       onSuccess();
       onClose();

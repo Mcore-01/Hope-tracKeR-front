@@ -17,9 +17,11 @@ import StartRepairDialog from './StartRepairDialog';
 import IssueDeviceDialog from './IssueDeviceDialog';
 import WriteOffDialog from './WriteOffDialog';
 import type { DeviceRequest } from '../../models/DeviceRequest';
+import { useAuth } from '../../hooks/useAuth';
 
 
 export default function DevicesTable() {
+  const { isAuth } = useAuth();
   const [devices, setDevices] = useState<DeviceResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -162,40 +164,44 @@ export default function DevicesTable() {
         const device = params.row as DeviceResponse;
         return (
           <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-            <Tooltip title="Удалить">
-              <IconButton size="small" color="error" onClick={() => handleDelete(device.id)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            {device.status === 'InStock' && (
+            {isAuth && (
               <>
-                <Tooltip title="В ремонт">
-                  <IconButton size="small" color="warning" onClick={() => {
-                    setRepairDeviceId(device.id);
-                    setRepairDialogOpen(true);
-                  }}>
-                    <BuildIcon fontSize="small" />
+                <Tooltip title="Удалить">
+                  <IconButton size="small" color="error" onClick={() => handleDelete(device.id)}>
+                    <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Выдать">
-                  <IconButton size="small" color="primary" onClick={() => {
-                    setIssueDeviceId(device.id);
-                    setIssueDialogOpen(true);
-                  }}>
-                    <AssignmentIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                {device.status === 'InStock' && (
+                  <>
+                    <Tooltip title="В ремонт">
+                      <IconButton size="small" color="warning" onClick={() => {
+                        setRepairDeviceId(device.id);
+                        setRepairDialogOpen(true);
+                      }}>
+                        <BuildIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Выдать">
+                      <IconButton size="small" color="primary" onClick={() => {
+                        setIssueDeviceId(device.id);
+                        setIssueDialogOpen(true);
+                      }}>
+                        <AssignmentIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                )}
+                {device.status !== 'WriteOff' && (
+                  <Tooltip title="Списать">
+                    <IconButton size="small" color="secondary" onClick={() => {
+                      setWriteOffDeviceId(device.id);
+                      setWriteOffDialogOpen(true);
+                    }}>
+                      <DeleteSweepIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </>
-            )}
-            {device.status !== 'WriteOff' && (
-              <Tooltip title="Списать">
-                <IconButton size="small" color="secondary" onClick={() => {
-                  setWriteOffDeviceId(device.id);
-                  setWriteOffDialogOpen(true);
-                }}>
-                  <DeleteSweepIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
             )}
           </Box>
         );
@@ -208,9 +214,11 @@ export default function DevicesTable() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h5" component="h2">Управление техникой</Typography>
         <Box>
-          <Button variant="contained" onClick={handleAdd} sx={{ mr: 1 }}>
-            Добавить технику
-          </Button>
+          {isAuth && (
+            <Button variant="contained" onClick={handleAdd} sx={{ mr: 1 }}>
+              Добавить технику
+            </Button>
+          )}
           <Button variant="outlined" onClick={handleExport}>
             Экспорт в Excel
           </Button>

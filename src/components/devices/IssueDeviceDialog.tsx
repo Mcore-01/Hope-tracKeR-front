@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAllEmployees } from '../../services/EmployeeService';
 import type { Employee } from '../../models/Employee';
 import { issueDevice } from '../../services/DeviceService';
+import { useAuth } from '../../hooks/useAuth';
 
 interface IssueDeviceDialogProps {
   open: boolean;
@@ -17,6 +18,7 @@ export default function IssueDeviceDialog({
   deviceId,
   onSuccess,
 }: IssueDeviceDialogProps) {
+  const { userId } = useAuth();
   const [employeeId, setEmployeeId] = useState<number>(0);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export default function IssueDeviceDialog({
       await issueDevice({
         itemId: deviceId,
         employeeId: employeeId,
-        userId: 1,
+        userId: Number(userId),
       });
       onSuccess();
       onClose();
