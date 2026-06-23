@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Box, Tabs, Tab } from '@mui/material';
-import BrandsCatalog from '../components/BrandsCatalog';
-import EmployeesCatalog from '../components/EmployeesCatalog';
-import AddressesCatalog from '../components/AddressesCatalog';
-import CategoriesCatalog from '../components/CategoriesCatalog';
+import BrandsCatalog from '../components/catalogs/BrandsCatalog';
+import EmployeesCatalog from '../components/catalogs/EmployeesCatalog';
+import AddressesCatalog from '../components/catalogs/AddressesCatalog';
+import CategoriesCatalog from '../components/catalogs/CategoriesCatalog';
 
 export default function CatalogPage() {
   const [tabIndex, setTabIndex] = useState(0);

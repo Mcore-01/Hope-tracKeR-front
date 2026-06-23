@@ -1,8 +1,8 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, Alert, Snackbar } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getAllAddresses } from '../services/AddressService';
-import type { Address } from '../models/Address';
-import { startRepair } from '../services/DeviceService';
+import { getAllAddresses } from '../../services/AddressService';
+import type { Address } from '../../models/Address';
+import { startRepair } from '../../services/DeviceService';
 
 interface StartRepairDialogProps {
   open: boolean;

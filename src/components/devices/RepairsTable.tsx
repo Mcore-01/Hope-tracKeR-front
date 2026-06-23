@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { Box, Button, Alert, Snackbar } from '@mui/material';
-import { getDevicesByFilter, generateRepairAct } from '../services/DeviceService';
-import type { DeviceResponse } from '../models/DeviceResponse';
+import { getDevicesByFilter, generateRepairAct } from '../../services/DeviceService';
+import type { DeviceResponse } from '../../models/DeviceResponse';
 import CompleteRepairDialog from './CompleteRepairDialog';
 
 export default function RepairsTable() {

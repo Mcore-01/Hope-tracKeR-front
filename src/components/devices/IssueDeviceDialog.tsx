@@ -1,8 +1,8 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, FormControl, InputLabel, Box, Alert, Snackbar } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getAllEmployees } from '../services/EmployeeService';
-import type { Employee } from '../models/Employee';
-import { issueDevice } from '../services/DeviceService';
+import { getAllEmployees } from '../../services/EmployeeService';
+import type { Employee } from '../../models/Employee';
+import { issueDevice } from '../../services/DeviceService';
 
 interface IssueDeviceDialogProps {
   open: boolean;

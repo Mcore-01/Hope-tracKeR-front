@@ -1,9 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
 import { DataGrid, GridCheckCircleIcon, type GridColDef } from '@mui/x-data-grid';
 import { Box, Chip, Alert, Snackbar, Typography, Paper, Button, IconButton, Tooltip } from '@mui/material';
-import { getDevicesByFilter, createDevice, updateDevice, deleteDevice, exportDevicesToExcel } from '../services/DeviceService';
-import type { DeviceResponse } from '../models/DeviceResponse';
-import { DeviceStatusLabels } from '../enums/DeviceStatus';
+import { getDevicesByFilter, createDevice, updateDevice, deleteDevice, exportDevicesToExcel } from '../../services/DeviceService';
+import type { DeviceResponse } from '../../models/DeviceResponse';
+import { DeviceStatusLabels } from '../../enums/DeviceStatus';
 import WarningIcon from '@mui/icons-material/Warning';
 import InfoIcon from '@mui/icons-material/Info';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -16,7 +16,8 @@ import DeviceFormDialog from './DeviceFormDialog';
 import StartRepairDialog from './StartRepairDialog';
 import IssueDeviceDialog from './IssueDeviceDialog';
 import WriteOffDialog from './WriteOffDialog';
-import type { DeviceRequest } from '../models/DeviceRequest';
+import type { DeviceRequest } from '../../models/DeviceRequest';
+
 
 export default function DevicesTable() {
   const [devices, setDevices] = useState<DeviceResponse[]>([]);

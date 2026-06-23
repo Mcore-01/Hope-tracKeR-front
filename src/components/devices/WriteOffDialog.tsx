@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, Alert, Snackbar } from '@mui/material';
 import { useState } from 'react';
-import { writeOffDevice } from '../services/DeviceService';
+import { writeOffDevice } from '../../services/DeviceService';
 
 interface WriteOffDialogProps {
   open: boolean;

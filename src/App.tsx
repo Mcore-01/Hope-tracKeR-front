@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import MainLayout from './components/MainLayout';
+import MainLayout from './pages/MainLayout';
 import CatalogPage from './pages/CatalogPage';
-import DevicesTable from './components/DevicesTable';
-import RepairsTable from './components/RepairsTable';
+import DevicesTable from './components/devices/DevicesTable';
+import RepairsTable from './components/devices/RepairsTable';
 
 function Dashboard() { return <div>Дашборд</div>; }
 function Consumables() { return <div>Расходники</div>; }

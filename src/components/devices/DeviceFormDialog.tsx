@@ -1,16 +1,16 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, Alert, Snackbar, CircularProgress, IconButton, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Select, MenuItem, FormControl, InputLabel, Box, Alert, Snackbar, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import type { DeviceRequest } from '../models/DeviceRequest';
-import type { DeviceResponse } from '../models/DeviceResponse';
-import { DeviceStatusLabels, type DeviceStatus } from '../enums/DeviceStatus';
-import { getAllBrands } from '../services/BrandService';
-import { getAllCategories } from '../services/CategoryService';
-import { getAllAddresses } from '../services/AddressService';
-import { getAllEmployees } from '../services/EmployeeService';
-import type { Brand } from '../models/Brand';
-import type { Category } from '../models/Category';
-import type { Address } from '../models/Address';
-import type { Employee } from '../models/Employee';
+import type { DeviceRequest } from '../../models/DeviceRequest';
+import type { DeviceResponse } from '../../models/DeviceResponse';
+import { DeviceStatusLabels, type DeviceStatus } from '../../enums/DeviceStatus';
+import { getAllBrands } from '../../services/BrandService';
+import { getAllCategories } from '../../services/CategoryService';
+import { getAllAddresses } from '../../services/AddressService';
+import { getAllEmployees } from '../../services/EmployeeService';
+import type { Brand } from '../../models/Brand';
+import type { Category } from '../../models/Category';
+import type { Address } from '../../models/Address';
+import type { Employee } from '../../models/Employee';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 

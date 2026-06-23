@@ -1,9 +1,10 @@
-import Button from '@mui/material/Button';
-import type { Category } from '../models/Category';
 import { useCallback, useEffect, useState } from 'react';
-import { createCategory, getAllCategories, removeCategory, updateCategory } from '../services/CategoryService';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography } from '@mui/material';
+import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography, IconButton, Tooltip, Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import type { Category } from '../../models/Category';
+import { createCategory, getAllCategories, removeCategory, updateCategory } from '../../services/CategoryService';
 
 export default function CategoriesCatalog() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -88,16 +89,20 @@ export default function CategoriesCatalog() {
     {
       field: 'actions',
       headerName: 'Действия',
-      width: 200,
+      width: 120,
       renderCell: (params) => (
-        <div>
-          <Button size="small" onClick={() => handleOpenDialog(params.row)}>
-            Изменить
-          </Button>
-          <Button size="small" color="error" onClick={() => handleDelete(params.row.id)}>
-            Удалить
-          </Button>
-        </div>
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+          <Tooltip title="Изменить">
+            <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Удалить">
+            <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       ),
     },
   ];
@@ -108,7 +113,7 @@ export default function CategoriesCatalog() {
         <Typography variant="h4" component="h1">
           Категории
         </Typography>
-        <Button variant="outlined" color="primary" onClick={() => handleOpenDialog()}>
+        <Button variant="contained" onClick={() => handleOpenDialog()}>
           Добавить
         </Button>
       </Box>

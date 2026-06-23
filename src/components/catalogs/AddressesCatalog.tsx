@@ -1,9 +1,10 @@
-import Button from '@mui/material/Button';
-import type { Address } from '../models/Address';
 import { useCallback, useEffect, useState } from 'react';
-import { createAddress, getAllAddresses, removeAddress, updateAddress } from '../services/AddressService';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography } from '@mui/material';
+import { Alert, Box, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField, Typography, IconButton, Tooltip, Button } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import type { Address } from '../../models/Address';
+import { createAddress, getAllAddresses, removeAddress, updateAddress } from '../../services/AddressService';
 
 export default function AddressesCatalog() {
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -110,16 +111,20 @@ export default function AddressesCatalog() {
     {
       field: 'actions',
       headerName: 'Действия',
-      width: 200,
+      width: 120,
       renderCell: (params) => (
-        <div>
-          <Button size="small" onClick={() => handleOpenDialog(params.row)}>
-            Изменить
-          </Button>
-          <Button size="small" color="error" onClick={() => handleDelete(params.row.id)}>
-            Удалить
-          </Button>
-        </div>
+        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+          <Tooltip title="Изменить">
+            <IconButton size="small" onClick={() => handleOpenDialog(params.row)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Удалить">
+            <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       ),
     },
   ];
@@ -130,7 +135,7 @@ export default function AddressesCatalog() {
         <Typography variant="h4" component="h1">
           Адреса
         </Typography>
-        <Button variant="outlined" color="primary" onClick={() => handleOpenDialog()}>
+        <Button variant="contained" onClick={() => handleOpenDialog()}>
           Добавить
         </Button>
       </Box>
