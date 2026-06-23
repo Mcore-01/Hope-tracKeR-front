@@ -7,12 +7,17 @@ import '@fontsource/roboto/700.css'
 import './index.css'
 import App from './App.tsx'
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
+import { ruRU } from './locales/ruRU.ts'
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
+
+const darkTheme = createTheme(
+  {
+    palette: {
+      mode: 'dark',
+    },
   },
-});
+  ruRU
+);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
